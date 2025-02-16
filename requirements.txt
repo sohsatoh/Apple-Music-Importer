@@ -1,0 +1,6 @@
+eyed3==0.9.7
+Requests==2.32.3
+setuptools==75.8.0
+spotipy==2.25.0
+typer==0.15.1
+typing_extensions==4.12.2
