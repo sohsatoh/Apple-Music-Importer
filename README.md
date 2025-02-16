@@ -29,10 +29,10 @@ apple-music-importer [OPTIONS] COMMAND [ARGS]...
 
 ### Global Options
 
-- `-rh, --request-headers` (required): Path to the JSON file containing request headers for the Apple Music API
-- `-tl, --track-list`: Path to a file containing track information (useful for resuming imports)
-- `-c, --country-code`: Country code for Apple Music search (default: US)
-- `-l, --limit`: Number of search results to retrieve (default: 3)
+- `--request-headers` (required): Path to the JSON file containing request headers for the Apple Music API
+- `--track-list`: Path to a file containing track information (useful for resuming imports)
+- `--country-code`: Country code for Apple Music search (default: US)
+- `--limit`: Number of search results to retrieve (default: 3)
 - `--require-confirm`: Requires confirmation for artist name mismatches (skips automatically if not set)
 
 ## Requirements
@@ -66,8 +66,8 @@ This mode scans local music files and attempts to match them with tracks availab
 #### Options
 
 - `FOLDER_PATH`: Path to the folder containing music files
-- `-ap, --artist-name-position`: Index of the artist name in the file path (default: -2)
-- `-al, --album-name-position`: Index of the album name in the file path (default: -1)
+- `--artist-name-position`: Index of the artist name in the file path (default: -2)
+- `--album-name-position`: Index of the album name in the file path (default: -1)
 - `--allow-edit`: Enables interactive editing of MP3 metadata for unmatched tracks (default: False)
 
 ### Spotify Mode
@@ -84,11 +84,11 @@ This mode synchronizes tracks from both local files and Spotify with Apple Music
 
 #### Options
 
-- `--delete-all`: Deletes all non-Apple Music tracks from the Apple Music Cloud Library
-- `--spotify`: Synchronizes tracks from Spotify
-- `--local`: Synchronizes tracks from local files
-- `--create-playlist`: Creates separate playlists for each source
-- `--add-to-library`: Adds synchronized tracks to the Apple Music Library
+- `--request-headers` (required): Path to the JSON file containing request headers for the Apple Music API
+- `--track-list`: Path to a file containing track information (useful for resuming imports)
+- `--country-code`: Country code for Apple Music search (default: US)
+- `--limit`: Number of search results to retrieve (default: 3)
+- `--require-confirm`: Requires confirmation for artist name mismatches (skips automatically if not set)
 
 ## License
 

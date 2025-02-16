@@ -35,24 +35,29 @@ def _add_tracks(
 
 def sync(
     ctx: typer.Context,
-    delete_all: bool = typer.Option(
+    delete_all_tracks: bool = typer.Option(
         False,
+        "--delete-all-tracks",
         help="Delete all tracks in the Apple Music Cloud Library (except for Apple Music tracks)",
     ),
-    spotify: bool = typer.Option(
+    sync_spotify: bool = typer.Option(
         False,
+        "--sync-spotify",
         help="Sync tracks from Spotify",
     ),
-    local: bool = typer.Option(
+    sync_local: bool = typer.Option(
         False,
+        "--sync-local",
         help="Sync tracks from local files",
     ),
     create_playlist: bool = typer.Option(
         False,
+        "--create-playlist",
         help="Create a playlist with the synced tracks (Each source will create a separate playlist)",
     ),
     add_to_library: bool = typer.Option(
         False,
+        "--add-to-library",
         help="Add the synced tracks to the Apple Music Library",
     ),
 ):
@@ -77,13 +82,13 @@ def sync(
     # TODO: Implement this
 
     # Second, add tracks from Spotify
-    if spotify:
+    if sync_spotify:
         _add_tracks(
             "spotify", track_list, apple_music_api, add_to_library, create_playlist
         )
 
     # Third, add tracks from local files
-    if local:
+    if sync_local:
         _add_tracks(
             "local", track_list, apple_music_api, add_to_library, create_playlist
         )

@@ -19,11 +19,10 @@ app.command()(sync)
 @app.callback()
 def callback(
     ctx: typer.Context,
-    request_header_json: Annotated[
+    request_headers_path: Annotated[
         Path,
         typer.Option(
             ...,
-            "-rh",
             "--request-headers",
             help="Path to JSON file containing request headers for Apple Music API",
             exists=True,
@@ -31,10 +30,9 @@ def callback(
             dir_okay=False,
         ),
     ],
-    track_list: Annotated[
+    track_list_path: Annotated[
         Optional[Path],
         typer.Option(
-            "-tl",
             "--track-list",
             help="Path to the file containing track info (resume from this file if specified)",
         ),
@@ -64,10 +62,10 @@ def callback(
     Track import tool for Apple Music
     """
     ctx.ensure_object(dict)
-    ctx.obj["request_headers"] = request_header_json
+    ctx.obj["request_headers"] = request_headers_path
     ctx.obj["country_code"] = country_code.lower()
     ctx.obj["limit"] = search_limit
-    ctx.obj["track_list"] = track_list
+    ctx.obj["track_list"] = track_list_path
     ctx.obj["require_confirm"] = require_confirm
 
 

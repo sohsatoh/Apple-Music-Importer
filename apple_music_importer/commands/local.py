@@ -74,14 +74,17 @@ def local(
     folder_path: Path,
     artist_name_position: int = typer.Option(
         -2,
+        "--artist-name-position",
         help="Position of artist name in file path (e.g., -2 for '.../Artist/Album/Title.mp3')",
     ),
     album_name_position: int = typer.Option(
         -1,
+        "--album-name-position",
         help="Position of album name in file path (e.g., -1 for '.../Artist/Album/Title.mp3')",
     ),
     allow_edit: bool = typer.Option(
         False,
+        "--allow-edit",
         help="Edit mp3 tag metadata interactively (only if the song is not found in Apple Music)",
     ),
 ):
