@@ -1,16 +1,16 @@
 # Apple Music Importer
 
-Apple Music Importer is a tool to import local music files into Apple Music. This tool reads the metadata of music files and searches for corresponding tracks using the Apple Music API.
+Apple Music Importer is a tool designed to import music from multiple sources, including local files and Spotify playlists, into Apple Music. By analyzing metadata from various sources, it searches for matching tracks via the Apple Music API, providing an efficient way to integrate your music collection.
 
 ## Disclaimer
 
-This tool was created for personal use and is not officially supported. There are no guarantees regarding its functionality, and the author assumes no responsibility for any issues or damages that may arise from its use. Use it at your own risk.
+This tool was developed for personal use and is not officially supported. Functionality is not guaranteed, and the author assumes no responsibility for any issues or damages resulting from its use. Use it at your own discretion.
 
-Additionally, the code was written out of necessity, so it may not be the most readable. If time permits, I might refactor it on a whim, but for now, expect it to be somewhat messy.
+The code was written primarily out of necessity and may not be the most polished. Future refactoring may occur, but for now, expect a somewhat unrefined implementation.
 
 ## Installation
 
-To use this tool, you need Python 3.7 or higher. Follow the steps below to install it.
+To use Apple Music Importer, you need Python 3.7 or higher. Follow the steps below to install:
 
 ```sh
 git clone https://github.com/sohsatoh/Apple-Music-Importer.git
@@ -27,74 +27,68 @@ python ./setup.py install
 apple-music-importer [OPTIONS] COMMAND [ARGS]...
 ```
 
-### Mode-independent Options
+### Global Options
 
-- `-rh, --request-headers`: Path to the JSON file containing the request headers for the Apple Music API (required)
-- `-tl, --track-list`: Path to the file containing track info (resume from this file if specified)
+- `-rh, --request-headers` (required): Path to the JSON file containing request headers for the Apple Music API
+- `-tl, --track-list`: Path to a file containing track information (useful for resuming imports)
 - `-c, --country-code`: Country code for Apple Music search (default: US)
 - `-l, --limit`: Number of search results to retrieve (default: 3)
-- `--require-confirm`: Require confirmation for artist name mismatch (skips automatically if not set)
+- `--require-confirm`: Requires confirmation for artist name mismatches (skips automatically if not set)
 
-### Requirements
+## Requirements
 
-### Request headers for Apple Music API
+### Apple Music API Request Headers
 
-To use the Apple Music API, you need to obtain the API key and other necessary information from the response headers.
-This is used with the `-rh, --request-headers` option.
+To interact with the Apple Music API, you must obtain an API key and required headers. These are used with the `-rh, --request-headers` option.
 
-### Steps
+#### Steps to Retrieve API Headers
 
-1. Open [https://music.apple.com/new](https://music.apple.com/new) in Chrome or another browser.
-2. Open the Developer Tools and go to the **Network** tab.
-3. Perform a search or any action that triggers a request to the Apple Music API.
+1. Open [Apple Music](https://music.apple.com/new) in a web browser.
+2. Open Developer Tools and navigate to the **Network** tab.
+3. Perform a search or an action that triggers an Apple Music API request.
 4. Right-click on the request and select **Copy as cURL**.
-5. Use a tool like [https://curlconverter.com/](https://curlconverter.com/) to convert the cURL command into Python code or extract the request headers as JSON.
+5. Use a tool like [cURL Converter](https://curlconverter.com/) to extract the request headers as JSON.
 
 ### Spotify OAuth Client
 
-To access the Spotify API, you need to register an application as a Spotify Developer. (This is not a particularly complicated process.)
+For Spotify integration, you need to register an application as a Spotify Developer and obtain OAuth credentials. These values are set as environment variables.
 
-These values will be used as environment variables.
+Follow the instructions at [Spotipy Authorization Code Flow](https://spotipy.readthedocs.io/en/2.11.1/#authorization-code-flow).
 
-Follow the instructions on the following page:
+## Modes of Operation
 
-<https://spotipy.readthedocs.io/en/2.11.1/#authorization-code-flow>
-
-## Modes
-
-This tool saves track information to a file using the local and spotify modes.
-Finally, you can use the sync mode to merge this information and synchronize it with Apple Music.
+Apple Music Importer supports multiple modes to import and synchronize music tracks efficiently.
 
 ### Local Mode
 
-The `local` mode allows you to search for local music files in Apple Music. It reads the metadata of the music files and searches for corresponding tracks using the Apple Music API. If the track is not found, you can optionally edit the metadata interactively.
+This mode scans local music files and attempts to match them with tracks available on Apple Music. If a match isn't found, you can optionally edit the metadata interactively.
 
-#### Mode-dependent Options
+#### Options
 
 - `FOLDER_PATH`: Path to the folder containing music files
-- `-ap, --artist-name-position`: Position of the artist name in the file path (default: -2)
-- `-al, --album-name-position`: Position of the album name in the file path (default: -1)
-- `--allow-edit`: Edit MP3 tag metadata interactively (only if the song is not found in Apple Music) (default: False)
+- `-ap, --artist-name-position`: Index of the artist name in the file path (default: -2)
+- `-al, --album-name-position`: Index of the album name in the file path (default: -1)
+- `--allow-edit`: Enables interactive editing of MP3 metadata for unmatched tracks (default: False)
 
 ### Spotify Mode
 
-The `spotify` mode allows you to import tracks from a Spotify playlist into Apple Music. It reads the metadata of the tracks in the Spotify playlist and searches for corresponding tracks using the Apple Music API.
+This mode imports tracks from a specified Spotify playlist, searching for corresponding tracks on Apple Music.
 
-#### Mode-dependent Options
+#### Options
 
-- `PLAYLIST_ID`: Spotify playlist ID to import tracks from
+- `PLAYLIST_ID`: Spotify playlist ID to import
 
 ### Sync Mode
 
-The `sync` mode allows you to sync tracks from Spotify and local files with Apple Music. You can choose to add the synced tracks to the Apple Music Library and/or create playlists with the synced tracks.
+This mode synchronizes tracks from both local files and Spotify with Apple Music. You can add synced tracks to your Apple Music Library and/or create playlists.
 
-#### Mode-dependent Options
+#### Options
 
-- `--delete-all`: Delete all tracks in the Apple Music Cloud Library (except for Apple Music tracks)
-- `--spotify`: Sync tracks from Spotify
-- `--local`: Sync tracks from local files
-- `--create-playlist`: Create a playlist with the synced tracks (Each source will create a separate playlist)
-- `--add-to-library`: Add the synced tracks to the Apple Music Library
+- `--delete-all`: Deletes all non-Apple Music tracks from the Apple Music Cloud Library
+- `--spotify`: Synchronizes tracks from Spotify
+- `--local`: Synchronizes tracks from local files
+- `--create-playlist`: Creates separate playlists for each source
+- `--add-to-library`: Adds synchronized tracks to the Apple Music Library
 
 ## License
 
