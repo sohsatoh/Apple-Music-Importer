@@ -139,7 +139,8 @@ class AppleMusicAPI:
                         title, album, artist, result, require_confirm
                     ):
                         continue
-                    return {"response": result, "match_type": match_type}
+                    result["match_type"] = match_type
+                    return result
             return None
         except UnauthorizedRequestException:
             raise

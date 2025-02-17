@@ -68,7 +68,7 @@ This mode scans local music files and attempts to match them with tracks availab
 - `FOLDER_PATH`: Path to the folder containing music files
 - `--artist-name-position`: Index of the artist name in the file path (default: -2)
 - `--album-name-position`: Index of the album name in the file path (default: -1)
-- `--allow-edit`: Enables interactive editing of MP3 metadata for unmatched tracks (default: False)
+- `--edit-tag`: Enables interactive editing of MP3 metadata for unmatched tracks (default: False)
 
 ### Spotify Mode
 

@@ -46,7 +46,7 @@ def _edit_metadata_interactively(track: dict) -> bool:
 
 
 def _search_and_update_track(
-    apple_music_api: AppleMusicAPI, track: dict, require_confirm: bool, allow_edit: bool
+    apple_music_api: AppleMusicAPI, track: dict, require_confirm: bool, edit_tag: bool
 ) -> dict:
     """Search for a track on Apple Music and update the track information."""
     search_result = apple_music_api.search_track_from_text(
@@ -58,11 +58,11 @@ def _search_and_update_track(
 
     if search_result is None:
         print(f"No results found for {track['title']} by {track['artist']}")
-        if allow_edit:
+        if edit_tag:
             success = _edit_metadata_interactively(track)
             if success:
                 return _search_and_update_track(
-                    apple_music_api, track, require_confirm, allow_edit
+                    apple_music_api, track, require_confirm, edit_tag
                 )
 
     track["apple_music"] = search_result
@@ -82,9 +82,9 @@ def local(
         "--album-name-position",
         help="Position of album name in file path (e.g., -1 for '.../Artist/Album/Title.mp3')",
     ),
-    allow_edit: bool = typer.Option(
+    edit_tag: bool = typer.Option(
         False,
-        "--allow-edit",
+        "--edit-tag",
         help="Edit mp3 tag metadata interactively (only if the song is not found in Apple Music)",
     ),
 ):
@@ -97,10 +97,15 @@ def local(
     # Load track information from local music files if no progress file is found
     print("Loading local music files...")
     files = _get_file_list_recursive(str(folder_path))
+    new_files = [
+        file
+        for file in files
+        if file not in [item.get("local", {}).get("path", "") for item in track_list]
+    ]
     track_list = merge_tracks(
         "local",
         MetadataHandler.get_track_list_from_files(
-            files, artist_name_position, album_name_position
+            new_files, artist_name_position, album_name_position
         ),
         track_list,
     )
@@ -128,7 +133,7 @@ def local(
                 f"Searching track {i}/{len(track_list)}: {track['title']} by {track['artist']}"
             )
             updated_track = _search_and_update_track(
-                apple_music_api, track, ctx.obj["require_confirm"], allow_edit
+                apple_music_api, track, ctx.obj["require_confirm"], edit_tag
             )
             track_list_with_apple_music_info.append(updated_track)
 

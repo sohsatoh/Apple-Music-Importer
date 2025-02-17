@@ -41,7 +41,6 @@ def save_track_list(track_list: List[Dict[str, Any]], track_list_path: Path) -> 
 
 
 def merge_tracks(service, new_tracks, track_list):
-    # Helper function to safely extract a nested value
     def safe_get(d, keys, default=None):
         for key in keys:
             if not isinstance(d, dict):
@@ -49,14 +48,12 @@ def merge_tracks(service, new_tracks, track_list):
             d = d.get(key)
         return d if d is not None else default
 
-    # 1. Create a dictionary using ISRC as the key (O(N))
     isrc_dict = {
         safe_get(track, ["apple_music", "response", "attributes", "isrc"]): track
         for track in track_list
         if safe_get(track, ["apple_music", "response", "attributes", "isrc"])
     }
 
-    # 2. Create dictionaries using title + artist and title only as keys (O(N))
     title_artist_dict = {
         f"{track.get('title', '')}|{track.get('artist', '')}": track
         for track in track_list
@@ -66,53 +63,43 @@ def merge_tracks(service, new_tracks, track_list):
         track.get("title", ""): track for track in track_list if track.get("title")
     }
 
-    # 3. Search for each track in the playlist and update or add it (O(M))
+    def get_service_data(track):
+        if service in track and isinstance(track[service], dict):
+            return track[service].copy()
+        return {
+            k: v
+            for k, v in track.items()
+            if k not in ("title", "artist", "album", service)
+        }
+
     for i, track in enumerate(new_tracks):
         print(f"Processing track {i+1}/{len(new_tracks)}...")
-
         isrc = track.get("isrc", "")
         title = track.get("title", "")
         artist = track.get("artist", "")
 
         if isrc and isrc in isrc_dict:
-            # Match found by ISRC (highest priority)
-            isrc_dict[isrc][service] = track
-            isrc_dict[isrc][service]["match_type"] = "isrc"
+            service_data = get_service_data(track)
+            service_data["match_type"] = "isrc"
+            isrc_dict[isrc][service] = service_data
         elif title and artist and f"{title}|{artist}" in title_artist_dict:
-            # Match found by title + artist
-            title_artist_dict[f"{title}|{artist}"][service] = track
-            title_artist_dict[f"{title}|{artist}"][service][
-                "match_type"
-            ] = "title_artist"
+            service_data = get_service_data(track)
+            service_data["match_type"] = "title_artist"
+            title_artist_dict[f"{title}|{artist}"][service] = service_data
         elif title and title in title_dict:
-            # Match found by title only
-            title_dict[title][service] = track
-            title_dict[title][service][service] = "title"
+            service_data = get_service_data(track)
+            service_data["match_type"] = "title"
+            title_dict[title][service] = service_data
         else:
+            print(f"No match found for {title} by {artist}")
+            service_data = get_service_data(track)
+            service_data["match_type"] = "new"
             track_to_be_added = {
                 "title": title,
                 "artist": artist,
                 "album": track.get("album", ""),
-                service: {**track, "match_type": "new"},
+                service: service_data,
             }
+            track_list.append(track_to_be_added)
 
-            # Skip if the track is already in the list. Determine it by "service": {**track}
-            if any(
-                existing_track.get(service) == track_to_be_added.get(service)
-                for existing_track in track_list
-                if existing_track.get(service)
-            ):
-                continue
-
-            # No match found, add as a new track
-            print(f"No match found for {title} by {artist}")
-            track_list.append(
-                {
-                    "title": title,
-                    "artist": artist,
-                    "album": track.get("album", ""),
-                    service: {**track, "match_type": "new"},
-                }
-            )
-
-    return track_list  # Return the updated track list
+    return track_list
